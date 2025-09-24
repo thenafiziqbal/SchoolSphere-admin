@@ -1,215 +1,428 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bn">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Online Admission Form</title>
+    <title>অ্যাডমিন প্যানেল - স্কুল ম্যানেজমেন্ট সিস্টেম</title>
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <style>
         :root {
-            --primary-color: #4a69bd;
-            --bg-color: #f4f7f6;
-            --text-color: #34495e;
-            --card-bg: #ffffff;
-            --shadow: 0 4px 25px rgba(0, 0, 0, 0.07);
-            --border-radius: 10px;
+            --primary-color: #1a237e; --secondary-color: #5c6bc0; --accent-color: #3949ab;
+            --bg-color: #f5f5f5; --sidebar-bg: #283593; --text-color: #333;
+            --card-bg: #ffffff; --danger-color: #d32f2f; --success-color: #2e7d32; --pending-color: #f9a825;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.08); --border-radius: 12px;
         }
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
-        }
-        #form-container {
-            background: var(--card-bg);
-            padding: 40px;
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow);
-            width: 100%;
-            max-width: 600px;
-            text-align: center;
-        }
-        #school-info img {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            margin-bottom: 10px;
-        }
-        h2 {
-            margin-bottom: 25px;
-            color: var(--primary-color);
-        }
-        .input-group {
-            margin-bottom: 20px;
-            text-align: left;
-        }
-        .input-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            font-size: 0.9rem;
-        }
-        .input-group input, .input-group select {
-            padding: 12px;
-            border: 1px solid #dfe6e9;
-            border-radius: 8px;
-            font-size: 1rem;
-            width: 100%;
-            box-sizing: border-box;
-        }
-        .btn {
-            padding: 12px 25px;
-            border: none;
-            background-color: var(--primary-color);
-            color: white;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1rem;
-            font-weight: 600;
-            width: 100%;
-            margin-top: 10px;
-        }
-        .btn:disabled {
-            background-color: #95a5a6;
-            cursor: not-allowed;
-        }
-        #success-message {
-            display: none;
-            padding: 20px;
-            background-color: #e8f5e9;
-            color: #2e7d32;
-            border-radius: var(--border-radius);
-            margin-top: 20px;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Noto Sans Bengali', sans-serif; background-color: var(--bg-color); color: var(--text-color); font-size: 16px; }
+        #login-container { display: flex; justify-content: center; align-items: center; height: 100vh; background: linear-gradient(135deg, #3f51b5, #1a237e); }
+        #login-box { background: var(--card-bg); padding: 40px; border-radius: var(--border-radius); box-shadow: var(--shadow); width: 90%; max-width: 400px; text-align: center; }
+        #login-box h2 { margin-bottom: 25px; color: var(--primary-color); }
+        .input-group { margin-bottom: 20px; text-align: left; }
+        .input-group label { display: block; margin-bottom: 8px; font-weight: 600; }
+        .input-group input, .input-group select, .input-group textarea { padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 1rem; width: 100%; }
+        .btn { padding: 12px 25px; border: none; background-color: var(--secondary-color); color: white; border-radius: 8px; cursor: pointer; font-size: 1rem; font-weight: 600; transition: background-color 0.3s; width: 100%; margin-top: 10px; }
+        .btn:hover { background-color: var(--accent-color); }
+        .btn-success { background-color: var(--success-color); }
+        .btn:disabled { background-color: #95a5a6; cursor: not-allowed; }
+        .btn-danger { background-color: var(--danger-color); }
+        .btn-danger:hover { background-color: #c62828; }
+        #app-wrapper { display: none; flex-direction: row; }
+        .sidebar { width: 260px; background-color: var(--sidebar-bg); color: white; display: flex; flex-direction: column; height: 100vh; position: fixed; }
+        .sidebar-header { padding: 25px 15px; border-bottom: 1px solid #4a627a; text-align: center; }
+        .sidebar-header h2 { font-size: 1.5rem; }
+        .sidebar nav ul { list-style: none; padding: 15px 0; }
+        .sidebar nav li a { display: flex; align-items: center; padding: 15px 30px; color: #ecf0f1; text-decoration: none; transition: all 0.3s ease; }
+        .sidebar nav li a:hover, .sidebar nav li a.active { background-color: var(--accent-color); }
+        .sidebar nav li a i { margin-right: 15px; width: 20px; text-align: center; }
+        #logout-btn { cursor: pointer; margin-top: auto; }
+        .main-content { margin-left: 260px; padding: 30px; width: calc(100% - 260px); }
+        .page { display: none; }
+        .page.active { display: block; animation: fadeIn 0.5s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        .card { background: var(--card-bg); padding: 25px; border-radius: var(--border-radius); box-shadow: var(--shadow); margin-bottom: 25px; }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #eee; }
+        .table-responsive { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 15px; text-align: left; border-bottom: 1px solid #ddd; vertical-align: middle; }
+        .action-buttons { display: flex; gap: 10px; }
+        .status-badge { padding: 5px 12px; border-radius: 20px; color: white; font-weight: 500; font-size: 0.85rem; }
+        .status-active, .status-approved { background-color: var(--success-color); }
+        .status-inactive { background-color: #616161; }
+        .status-trial, .status-pending { background-color: var(--pending-color); }
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.6); }
+        .modal-content { background-color: #fefefe; margin: 5% auto; padding: 25px; border: 1px solid #888; width: 90%; max-width: 600px; border-radius: var(--border-radius); }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 15px; border-bottom: 1px solid #eee; }
+        .modal-header h2 { margin: 0; }
+        .close-btn { color: #aaa; font-size: 28px; font-weight: bold; cursor: pointer; }
+        .grid-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+        .stat-card { background: linear-gradient(135deg, var(--secondary-color), var(--accent-color)); color: white; padding: 20px; border-radius: var(--border-radius); text-align: center; }
+        .stat-card h3 { font-size: 1.2rem; margin-bottom: 10px; }
+        .stat-card p { font-size: 2.5rem; font-weight: bold; }
+        .tabs { display: flex; border-bottom: 2px solid #ddd; margin-bottom: 20px; }
+        .tab-link { padding: 10px 20px; cursor: pointer; border: none; background: none; font-size: 1rem; font-weight: 600; color: var(--primary-color); }
+        .tab-link.active { border-bottom: 3px solid var(--secondary-color); color: var(--secondary-color); }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
     </style>
 </head>
 <body>
 
-    <div id="form-container">
-        <div id="school-info">
-            <img id="schoolLogo" src="https://i.ibb.co/6yT1WfX/school-logo-placeholder.png" alt="School Logo">
-            <h2 id="schoolName">Admission Form</h2>
-        </div>
-        
-        <form id="admissionForm">
-            <div class="input-group">
-                <label for="studentName">Applicant's Full Name</label>
-                <input type="text" id="studentName" name="studentName" required>
-            </div>
-            <div class="input-group">
-                <label for="guardianName">Guardian's Full Name</label>
-                <input type="text" id="guardianName" name="guardianName" required>
-            </div>
-            <div class="input-group">
-                <label for="guardianContact">Guardian's Contact Number</label>
-                <input type="tel" id="guardianContact" name="guardianContact" required>
-            </div>
-            <div class="input-group">
-                <label for="className">Applying for Class</label>
-                <select id="className" name="className" required>
-                    <option value="">11</option>
-                    <option value="">12</option>
-                    <option value="">10</option>
-                    <option value="">9</option>
-                </select>
-            </div>
-            <div class="input-group">
-                <label for="profilePicUrl">Applicant's Photo URL (Optional)</label>
-                <input type="url" id="profilePicUrl" name="profilePicUrl" placeholder="https://example.com/photo.jpg">
-            </div>
-            <button type="submit" class="btn" id="submitBtn">Submit Application</button>
-        </form>
-        <div id="success-message">
-            <h3>Thank You!</h3>
-            <p>Your application has been submitted successfully. We will contact you soon.</p>
+    <div id="login-container">
+        <div id="login-box">
+            <h2>সুপার অ্যাডমিন প্যানেল</h2>
+            <form id="adminLoginForm">
+                <div class="input-group"><label for="adminEmail">ইমেইল</label><input type="email" id="adminEmail" required></div>
+                <div class="input-group"><label for="adminPassword">পাসওয়ার্ড</label><input type="password" id="adminPassword" required></div>
+                <button type="submit" class="btn">প্রবেশ করুন</button>
+            </form>
         </div>
     </div>
+    
+    <div id="app-wrapper">
+        <aside class="sidebar">
+            <div class="sidebar-header"><h2>ম্যানেজমেন্ট সিস্টেম</h2></div>
+            <nav>
+                <ul>
+                    <!-- নেভিগেশন লিংক আপডেট করা হয়েছে -->
+                    <li><a href="#dashboard" class="nav-link active"><i class="fas fa-tachometer-alt"></i> ড্যাশবোর্ড</a></li>
+                    <li><a href="#schools" class="nav-link"><i class="fas fa-school"></i> স্কুল ম্যানেজমেন্ট</a></li>
+                    <li><a href="#payments" class="nav-link"><i class="fas fa-money-check-alt"></i> পেমেন্ট ম্যানেজমেন্ট</a></li>
+                    <li><a href="#settings" class="nav-link"><i class="fas fa-cogs"></i> সিস্টেম সেটিংস</a></li>
+                </ul>
+            </nav>
+            <a id="logout-btn" class="nav-link" style="padding: 15px 30px;"><i class="fas fa-sign-out-alt"></i> লগআউট</a>
+        </aside>
+
+        <main class="main-content">
+            <header style="margin-bottom: 20px;"><h1 id="page-title">ড্যাশবোর্ড</h1></header>
+            
+            <section id="dashboard" class="page active">
+                <div class="grid-container" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+                    <div class="stat-card"><h3>মোট স্কুল</h3><p id="total-schools">0</p></div>
+                    <div class="stat-card"><h3>মোট শিক্ষক</h3><p id="total-teachers">0</p></div>
+                    <div class="stat-card"><h3>পেন্ডিং পেমেন্ট</h3><p id="pending-payments">0</p></div>
+                </div>
+            </section>
+            
+            <section id="schools" class="page">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>স্কুলের তালিকা</h2>
+                        <button class="btn" id="add-school-btn" style="width:auto; margin-top:0;"><i class="fas fa-plus"></i> নতুন স্কুল যোগ করুন</button>
+                    </div>
+                    <div class="table-responsive">
+                        <table>
+                            <thead><tr><th>স্কুলের নাম</th><th>প্ল্যান</th><th>স্ট্যাটাস</th><th>মেয়াদ শেষ হবে</th><th>অ্যাকশন</th></tr></thead>
+                            <tbody id="schools-table-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- নতুন পেমেন্ট ম্যানেজমেন্ট পেজ -->
+            <section id="payments" class="page">
+                <div class="card">
+                    <div class="card-header"><h2>পেমেন্ট যাচাইয়ের তালিকা</h2></div>
+                    <div class="table-responsive">
+                        <table>
+                            <thead><tr><th>স্কুলের নাম</th><th>প্যাকেজ</th><th>টাকা</th><th>ট্রানজেকশন আইডি</th><th>স্ট্যাটাস</th><th>অ্যাকশন</th></tr></thead>
+                            <tbody id="payments-table-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- নতুন সিস্টেম সেটিংস পেজ -->
+            <section id="settings" class="page">
+                <div class="tabs">
+                    <button class="tab-link active" onclick="openTab(event, 'packages')">প্যাকেজ ম্যানেজমেন্ট</button>
+                    <button class="tab-link" onclick="openTab(event, 'paymentMethods')">পেমেন্ট মেথড</button>
+                    <button class="tab-link" onclick="openTab(event, 'notices')">নোটিশ ও পপ-আপ</button>
+                </div>
+
+                <div id="packages" class="tab-content active">
+                    <div class="card">
+                        <div class="card-header"><h2>সাবস্ক্রিপশন প্যাকেজ</h2><button class="btn" onclick="openAddPackageModal()" style="width:auto; margin-top:0;">নতুন প্যাকেজ</button></div>
+                        <div id="packages-list" class="grid-container"></div>
+                    </div>
+                </div>
+
+                <div id="paymentMethods" class="tab-content">
+                    <div class="card">
+                         <div class="card-header"><h2>পেমেন্ট মেথড</h2><button class="btn" onclick="openAddPaymentMethodModal()" style="width:auto; margin-top:0;">নতুন মেথড</button></div>
+                         <div id="payment-methods-list"></div>
+                    </div>
+                </div>
+
+                <div id="notices" class="tab-content">
+                    <div class="card">
+                        <div class="card-header"><h2>ইউজার প্যানেলের জন্য নোটিশ</h2></div>
+                        <form id="noticeForm">
+                            <div class="input-group"><label>নোটিশের বিষয়বস্তু (খালি রাখলে নোটিশ দেখাবে না)</label><textarea name="text" id="noticeText" rows="4"></textarea></div>
+                            <div class="input-group"><label><input type="checkbox" name="isActive" id="noticeIsActive"> নোটিশটি সক্রিয় করুন</label></div>
+                            <button class="btn btn-success" type="submit">নোটিশ সেভ করুন</button>
+                        </form>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- Universal Modal -->
+    <div id="adminModal" class="modal"><div class="modal-content"><div class="modal-header"><h2 id="modalTitle"></h2><span class="close-btn" onclick="closeModal()">&times;</span></div><div class="modal-body" id="modalBody"></div></div></div>
 
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
 
     <script>
-        // IMPORTANT: Add your Firebase configuration here (must be same as admin panel)
+        // --- আগের কোড অপরিবর্তিত ---
         const firebaseConfig = {
             apiKey: "AIzaSyBtedt3DdNf3cX99-tOsqdnvMhDGFphNsI",
             authDomain: "schoolmanazmentbynfz.firebaseapp.com",
             databaseURL: "https://schoolmanazmentbynfz-default-rtdb.firebaseio.com",
             projectId: "schoolmanazmentbynfz",
-            storageBucket: "schoolmanazmentbynfz.firebasestorage.app",
+            storageBucket: "schoolmanazmentbynfz.appspot.com",
             messagingSenderId: "12002840470",
-            appId: "1:12002840470:web:cfaaf4db50c030067017b7",
-            measurementId: "G-TQEDT28GR2"
+            appId: "1:12002840470:web:cfaaf4db50c030067017b7"
         };
-        
         firebase.initializeApp(firebaseConfig);
+        const secondaryApp = firebase.initializeApp(firebaseConfig, "secondary");
+        const secondaryAuth = secondaryApp.auth();
         const db = firebase.database();
+        const mainAuth = firebase.auth(); 
+        const SUPER_ADMIN_UID = 'eNQQmE1X60Rv7SMWNWpiLlLJ7Mi2'; 
+        let appState = { user: null, schools: {}, payments: {}, settings: {} };
 
-        // !! IMPORTANT !! - Replace this with your actual School ID from Firebase
-        const schoolId = "-N_p1xQZYWkXn2r-z6jG"; // Example ID, replace it
-
-        document.addEventListener('DOMContentLoaded', () => {
-            loadFormSettings();
-            
-            const admissionForm = document.getElementById('admissionForm');
-            admissionForm.addEventListener('submit', handleFormSubmit);
+        // --- AUTHENTICATION & INITIALIZATION (অপরিবর্তিত) ---
+        document.getElementById('adminLoginForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            mainAuth.signInWithEmailAndPassword(e.target.adminEmail.value, e.target.adminPassword.value)
+                .then(cred => {
+                    if (cred.user.uid !== SUPER_ADMIN_UID) { mainAuth.signOut(); throw new Error('অনুমোদিত নন।'); }
+                    appState.user = cred.user;
+                    initializeApp();
+                }).catch(err => alert("লগইন ব্যর্থ: " + err.message));
         });
-
-        function loadFormSettings() {
-            const settingsRef = db.ref(`schools/${schoolId}/settings`);
-            const classesRef = db.ref(`schools/${schoolId}/admissionSettings/formClasses`);
-
-            // Load school name and logo (only once)
-            settingsRef.once('value').then(snapshot => {
-                const settings = snapshot.val() || {};
-                document.getElementById('schoolName').textContent = `${settings.schoolName || 'School'} Admission`;
-                document.getElementById('schoolLogo').src = settings.schoolLogoUrl || 'https://i.ibb.co/6yT1WfX/school-logo-placeholder.png';
-            });
-            
-            // --- SOLUTION ---
-            // Load and LISTEN for real-time updates for classes
-            classesRef.on('value', snapshot => {
-                const classes = snapshot.val() || {};
-                const classSelector = document.getElementById('className');
-                classSelector.innerHTML = '<option value="">Select a Class...</option>';
-                if (Object.keys(classes).length > 0) {
-                    Object.values(classes).forEach(cls => {
-                        classSelector.innerHTML += `<option value="${cls.name}">${cls.name}</option>`;
-                    });
-                } else {
-                    classSelector.innerHTML = '<option value="">Admissions are currently closed.</option>';
-                }
-            });
+        document.getElementById('logout-btn').addEventListener('click', () => mainAuth.signOut().then(() => window.location.reload()));
+        function initializeApp() {
+            document.getElementById('login-container').style.display = 'none';
+            document.getElementById('app-wrapper').style.display = 'flex';
+            attachEventListeners();
+            fetchAllData();
         }
 
-        function handleFormSubmit(e) {
+        // --- DATA FETCHING (আপডেট করা হয়েছে) ---
+        function fetchAllData() {
+            db.ref('schools').on('value', s => { appState.schools = s.val() || {}; renderDashboard(); renderSchoolsTable(); });
+            db.ref('payment_requests').on('value', s => { appState.payments = s.val() || {}; renderDashboard(); renderPaymentsTable(); });
+            db.ref('system_settings').on('value', s => { appState.settings = s.val() || {}; renderSettingsPage(); });
+        }
+
+        // --- RENDERING FUNCTIONS (নতুন এবং আপডেট করা) ---
+        function renderDashboard() {
+            document.getElementById('total-schools').textContent = Object.keys(appState.schools).length;
+            let totalTeachers = 0;
+            Object.values(appState.schools).forEach(s => totalTeachers += Object.keys(s.teachers || {}).length);
+            document.getElementById('total-teachers').textContent = totalTeachers;
+            const pendingPayments = Object.values(appState.payments).filter(p => p.status === 'pending').length;
+            document.getElementById('pending-payments').textContent = pendingPayments;
+        }
+
+        function renderSchoolsTable() {
+            const tbody = document.getElementById('schools-table-body');
+            tbody.innerHTML = '';
+            for (const id in appState.schools) {
+                const school = appState.schools[id];
+                const sub = school.subscription || { plan: 'Free', status: 'Inactive' };
+                tbody.innerHTML += `<tr>
+                    <td>${school.settings?.schoolName || 'নাম নেই'}</td>
+                    <td>${sub.plan || 'N/A'}</td>
+                    <td><span class="status-badge status-${sub.status?.toLowerCase()}">${sub.status || 'N/A'}</span></td>
+                    <td>${sub.endDate || 'N/A'}</td>
+                    <td><div class="action-buttons">
+                        <button class="btn" style="width:auto;padding:8px 15px;" onclick="openManageSubscriptionModal('${id}')">ম্যানেজ</button>
+                        <button class="btn btn-danger" style="width:auto;padding:8px 15px;" onclick="deleteSchool('${id}')">মুছুন</button>
+                    </div></td>
+                </tr>`;
+            }
+        }
+        
+        function renderPaymentsTable() {
+            const tbody = document.getElementById('payments-table-body');
+            tbody.innerHTML = '';
+            for(const id in appState.payments) {
+                const req = appState.payments[id];
+                const schoolName = appState.schools[req.schoolId]?.settings?.schoolName || 'Unknown School';
+                tbody.innerHTML += `<tr>
+                    <td>${schoolName}</td>
+                    <td>${req.packageName}</td>
+                    <td>${req.amount}</td>
+                    <td>${req.transactionId}</td>
+                    <td><span class="status-badge status-${req.status}">${req.status}</span></td>
+                    <td>${req.status === 'pending' ? `<button class="btn" style="width:auto;padding:8px 15px;" onclick="openVerifyPaymentModal('${id}')">যাচাই</button>` : '-'}</td>
+                </tr>`;
+            }
+        }
+        
+        function renderSettingsPage() {
+            // Packages
+            const pkgList = document.getElementById('packages-list');
+            pkgList.innerHTML = '';
+            for(const id in appState.settings.packages) {
+                const pkg = appState.settings.packages[id];
+                pkgList.innerHTML += `<div class="card"><h4>${pkg.name}</h4><p>মূল্য: ${pkg.price} টাকা</p><p>মেয়াদ: ${pkg.durationDays} দিন</p><p>${pkg.isPremium ? '<b>প্রিমিয়াম ফিচার আনলকড</b>' : 'ফ্রি ফিচার'}</p><div class="action-buttons"><button onclick="openAddPackageModal('${id}')">Edit</button><button onclick="deleteItem('packages/${id}', 'system_settings')">Delete</button></div></div>`;
+            }
+            // Payment Methods
+            const methodList = document.getElementById('payment-methods-list');
+            methodList.innerHTML = '';
+            for(const id in appState.settings.paymentMethods) {
+                const method = appState.settings.paymentMethods[id];
+                methodList.innerHTML += `<div class="card"><h4>${method.name} (${method.type})</h4><p>নম্বর: ${method.number}</p><p>বিশেষ কোড: <b>${method.specialCode}</b></p><div class="action-buttons"><button onclick="openAddPaymentMethodModal('${id}')">Edit</button><button onclick="deleteItem('paymentMethods/${id}', 'system_settings')">Delete</button></div></div>`;
+            }
+            // Notice
+            const notice = appState.settings.notice || {};
+            document.getElementById('noticeText').value = notice.text || '';
+            document.getElementById('noticeIsActive').checked = notice.isActive || false;
+        }
+
+        // --- MODAL FUNCTIONS (নতুন) ---
+        function openVerifyPaymentModal(id) {
+            const req = appState.payments[id];
+            const schoolName = appState.schools[req.schoolId]?.settings?.schoolName;
+            const html = `
+                <p><strong>স্কুল:</strong> ${schoolName}</p>
+                <p><strong>প্যাকেজ:</strong> ${req.packageName}</p>
+                <p><strong>টাকার পরিমাণ:</strong> ${req.amount}</p>
+                <p><strong>পেমেন্ট মেথড:</strong> ${req.method}</p>
+                <p><strong>প্রেরকের নম্বর:</strong> ${req.senderNumber}</p>
+                <p><strong>ট্রানজেকশন আইডি:</strong> ${req.transactionId}</p>
+                <p><strong>বিশেষ কোড:</strong> ${req.specialCode}</p>
+                <hr>
+                <form id="approvePaymentForm" data-req-id="${id}">
+                    <button type="submit" class="btn btn-success" style="width:100%;">পেমেন্ট অ্যাপ্রুভ করুন</button>
+                </form>
+            `;
+            openModal("পেমেন্ট যাচাই করুন", html);
+        }
+        
+        function openAddPackageModal(id = null) {
+            const pkg = id ? appState.settings.packages[id] : {};
+            const html = `<form id="packageForm" data-id="${id || ''}">
+                <div class="input-group"><label>প্যাকেজের নাম</label><input name="name" value="${pkg.name || ''}" required></div>
+                <div class="input-group"><label>মূল্য (টাকা)</label><input type="number" name="price" value="${pkg.price || ''}" required></div>
+                <div class="input-group"><label>মেয়াদ (দিন)</label><input type="number" name="durationDays" value="${pkg.durationDays || ''}" required></div>
+                <div class="input-group"><label><input type="checkbox" name="isPremium" ${pkg.isPremium ? 'checked' : ''}> প্রিমিয়াম ফিচার?</label></div>
+                <button type="submit" class="btn">${id ? 'আপডেট' : 'যোগ করুন'}</button>
+            </form>`;
+            openModal(id ? 'প্যাকেজ এডিট' : 'নতুন প্যাকেজ', html);
+        }
+        
+        function openAddPaymentMethodModal(id = null) {
+            const method = id ? appState.settings.paymentMethods[id] : {};
+            const html = `<form id="paymentMethodForm" data-id="${id || ''}">
+                <div class="input-group"><label>নাম (e.g., বিকাশ)</label><input name="name" value="${method.name || ''}" required></div>
+                <div class="input-group"><label>টাইপ (Personal/Agent)</label><input name="type" value="${method.type || ''}" required></div>
+                <div class="input-group"><label>নম্বর</label><input name="number" value="${method.number || ''}" required></div>
+                <div class="input-group"><label>বিশেষ কোড (User must enter this)</label><input name="specialCode" value="${method.specialCode || ''}" required></div>
+                <button type="submit" class="btn">${id ? 'আপডেট' : 'যোগ করুন'}</button>
+            </form>`;
+            openModal(id ? 'মেথড এডিট' : 'নতুন পেমেন্ট মেথড', html);
+        }
+
+        // --- FORM SUBMISSION LOGIC (আপডেট করা হয়েছে) ---
+        function handleFormSubmits(e) {
             e.preventDefault();
             const form = e.target;
-            const submitBtn = document.getElementById('submitBtn');
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Submitting...';
+            const btn = form.querySelector('button[type="submit"]');
+            btn.disabled = true;
 
-            const formData = new FormData(form);
-            const data = Object.fromEntries(formData.entries());
-            data.submissionDate = new Date().toISOString(); // Add submission timestamp
+            const actions = {
+                'approvePaymentForm': () => {
+                    const reqId = form.dataset.reqId;
+                    const req = appState.payments[reqId];
+                    const pkg = Object.values(appState.settings.packages).find(p => p.name === req.packageName);
+                    const newEndDate = new Date();
+                    newEndDate.setDate(newEndDate.getDate() + parseInt(pkg.durationDays));
+                    
+                    const updates = {};
+                    updates[`/payment_requests/${reqId}/status`] = 'approved';
+                    updates[`/schools/${req.schoolId}/subscription/status`] = 'Active';
+                    updates[`/schools/${req.schoolId}/subscription/plan`] = pkg.name;
+                    updates[`/schools/${req.schoolId}/subscription/isPremium`] = pkg.isPremium || false;
+                    updates[`/schools/${req.schoolId}/subscription/endDate`] = newEndDate.toISOString().split('T')[0];
+                    
+                    db.ref().update(updates).then(() => { alert('পেমেন্ট সফলভাবে অ্যাপ্রুভ করা হয়েছে!'); closeModal(); }).catch(err => alert(err.message));
+                },
+                'packageForm': () => {
+                    const id = form.dataset.id || db.ref().child('system_settings/packages').push().key;
+                    const data = { name: form.name.value, price: form.price.value, durationDays: form.durationDays.value, isPremium: form.isPremium.checked };
+                    db.ref(`system_settings/packages/${id}`).set(data).then(() => { alert('প্যাকেজ সেভ হয়েছে!'); closeModal(); });
+                },
+                'paymentMethodForm': () => {
+                    const id = form.dataset.id || db.ref().child('system_settings/paymentMethods').push().key;
+                    const data = { name: form.name.value, type: form.type.value, number: form.number.value, specialCode: form.specialCode.value };
+                    db.ref(`system_settings/paymentMethods/${id}`).set(data).then(() => { alert('মেথড সেভ হয়েছে!'); closeModal(); });
+                },
+                'noticeForm': () => {
+                    const data = { text: form.text.value, isActive: form.isActive.checked };
+                    db.ref('system_settings/notice').set(data).then(() => alert('নোটিশ সেভ হয়েছে!'));
+                },
+                'addSchoolForm': () => { /* আগের কোড */ },
+                'editSchoolForm': () => { /* আগের কোড */ }
+            };
 
-            const applicationsRef = db.ref(`schools/${schoolId}/admissionApplications`);
-            applicationsRef.push(data)
-                .then(() => {
-                    form.style.display = 'none';
-                    document.getElementById('success-message').style.display = 'block';
-                })
-                .catch(error => {
-                    alert('An error occurred: ' + error.message);
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = 'Submit Application';
-                });
+            const action = actions[form.id] || (() => { 
+                if (form.id === 'addSchoolForm' || form.id === 'editSchoolForm') {
+                    // Re-implementing existing logic to avoid breaking it
+                    if (form.id === 'addSchoolForm') {
+                         secondaryAuth.createUserWithEmailAndPassword(form.adminEmail.value, form.adminPassword.value)
+                            .then(cred => {
+                                const adminUid = cred.user.uid;
+                                const newSchoolKey = db.ref().child('schools').push().key;
+                                const updates = {};
+                                updates[`/schools/${newSchoolKey}/settings/schoolName`] = form.schoolName.value;
+                                updates[`/schools/${newSchoolKey}/roles/admins/${adminUid}`] = true;
+                                updates[`/user_school_map/${adminUid}`] = newSchoolKey;
+                                // Add a basic free/trial subscription
+                                updates[`/schools/${newSchoolKey}/subscription`] = { plan: 'Free', status: 'Trial', isPremium: false, endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] };
+                                return db.ref().update(updates);
+                            }).then(() => { alert('স্কুল তৈরি হয়েছে!'); closeModal(); secondaryAuth.signOut(); }).catch(err => alert(err.message));
+                    } else { // editSchoolForm
+                        const schoolId = form.dataset.schoolId;
+                        const data = { status: form.status.value, startDate: form.startDate.value, endDate: form.endDate.value };
+                        db.ref(`schools/${schoolId}/subscription`).update(data).then(() => { alert('তথ্য আপডেট হয়েছে!'); closeModal(); });
+                    }
+                }
+            });
+
+            action();
+            btn.disabled = false;
         }
+
+        // --- বাকি সকল Helper ফাংশন (navigateTo, openModal, closeModal, deleteSchool ইত্যাদি অপরিবর্তিত) ---
+        function openTab(evt, tabName) {
+            document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+            document.querySelectorAll('.tab-link').forEach(tl => tl.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            evt.currentTarget.classList.add('active');
+        }
+        function attachEventListeners() { document.querySelectorAll('.nav-link').forEach(link => { link.addEventListener('click', (e) => { e.preventDefault(); navigateTo(e.currentTarget.getAttribute('href').substring(1)); }); }); document.getElementById('add-school-btn').addEventListener('click', openAddSchoolModal); document.body.addEventListener('submit', handleFormSubmits); }
+        function navigateTo(pageId) { document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.getElementById(pageId).classList.add('active'); document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active')); document.querySelector(`.nav-link[href="#${pageId}"]`).classList.add('active'); document.getElementById('page-title').textContent = document.querySelector(`.nav-link[href="#${pageId}"]`).textContent; }
+        function openModal(title, formHTML) { document.getElementById('modalTitle').textContent = title; document.getElementById('modalBody').innerHTML = formHTML; document.getElementById('adminModal').style.display = 'block'; }
+        function closeModal() { document.getElementById('adminModal').style.display = "none"; }
+        window.onclick = (event) => { if (event.target == document.getElementById('adminModal')) closeModal(); };
+        function openAddSchoolModal() { const formHTML = `<form id="addSchoolForm"><div class="input-group"><label for="schoolName">স্কুলের নাম</label><input type="text" id="schoolName" name="schoolName" required></div><hr style="margin: 20px 0;"><h4>স্কুল অ্যাডমিন তৈরি করুন</h4><div class="input-group"><label for="adminEmail">অ্যাডমিনের ইমেইল</label><input type="email" id="adminEmail" name="adminEmail" required></div><div class="input-group"><label for="adminPassword">অ্যাডমিনের জন্য পাসওয়ার্ড</label><input type="password" id="adminPassword" name="adminPassword" minlength="6" required></div><button type="submit" class="btn">স্কুল তৈরি করুন</button></form>`; openModal('নতুন স্কুল যোগ করুন', formHTML); }
+        function openManageSubscriptionModal(schoolId) { const school = appState.schools[schoolId]; if (!school) return; const sub = school.subscription || { status: 'Inactive', startDate: '', endDate: '' }; const formHTML = `<form id="editSchoolForm" data-school-id="${schoolId}"><div class="input-group"><label>স্ট্যাটাস</label><select name="status" required><option value="Active" ${sub.status === 'Active' ? 'selected' : ''}>Active</option><option value="Inactive" ${sub.status === 'Inactive' ? 'selected' : ''}>Inactive</option><option value="Trial" ${sub.status === 'Trial' ? 'selected' : ''}>Trial</option></select></div><div class="input-group"><label>শুরুর তারিখ</label><input type="date" name="startDate" value="${sub.startDate || ''}"></div><div class="input-group"><label>শেষের তারিখ</label><input type="date" name="endDate" value="${sub.endDate || ''}"></div><button type="submit" class="btn">আপডেট</button></form>`; openModal(`"${school.settings?.schoolName || 'নাম নেই'}" ম্যানেজ করুন`, formHTML); }
+        function deleteSchool(schoolId) { const schoolName = appState.schools[schoolId]?.settings?.schoolName || schoolId; if (confirm(`আপনি কি "${schoolName}" স্কুল এবং এর সমস্ত ডেটা মুছে ফেলতে চান?`)) { db.ref(`schools/${schoolId}`).remove().then(() => alert('স্কুল সফলভাবে মুছে ফেলা হয়েছে।')).catch(error => alert('ত্রুটি: ' + error.message)); } }
+        function deleteItem(path, rootNode) { if (confirm('নিশ্চিতভাবে মুছতে চান?')) { db.ref(`${rootNode}/${path}`).remove().catch(err => alert(err.message)); } }
+
     </script>
 </body>
 </html>
