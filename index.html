@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Admission Form</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4a69bd;
+            --bg-color: #f4f7f6;
+            --text-color: #34495e;
+            --card-bg: #ffffff;
+            --shadow: 0 4px 25px rgba(0, 0, 0, 0.07);
+            --border-radius: 10px;
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        #form-container {
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+        }
+        #school-info img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin-bottom: 10px;
+        }
+        h2 {
+            margin-bottom: 25px;
+            color: var(--primary-color);
+        }
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        .input-group input, .input-group select {
+            padding: 12px;
+            border: 1px solid #dfe6e9;
+            border-radius: 8px;
+            font-size: 1rem;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            width: 100%;
+            margin-top: 10px;
+        }
+        .btn:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+        #success-message {
+            display: none;
+            padding: 20px;
+            background-color: #e8f5e9;
+            color: #2e7d32;
+            border-radius: var(--border-radius);
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="form-container">
+        <div id="school-info">
+            <img id="schoolLogo" src="https://i.ibb.co/6yT1WfX/school-logo-placeholder.png" alt="School Logo">
+            <h2 id="schoolName">Admission Form</h2>
+        </div>
+        
+        <form id="admissionForm">
+            <div class="input-group">
+                <label for="studentName">Applicant's Full Name</label>
+                <input type="text" id="studentName" name="studentName" required>
+            </div>
+            <div class="input-group">
+                <label for="guardianName">Guardian's Full Name</label>
+                <input type="text" id="guardianName" name="guardianName" required>
+            </div>
+            <div class="input-group">
+                <label for="guardianContact">Guardian's Contact Number</label>
+                <input type="tel" id="guardianContact" name="guardianContact" required>
+            </div>
+            <div class="input-group">
+                <label for="className">Applying for Class</label>
+                <select id="className" name="className" required>
+                    <option value="">11</option>
+                    <option value="">12</option>
+                    <option value="">10</option>
+                    <option value="">9</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label for="profilePicUrl">Applicant's Photo URL (Optional)</label>
+                <input type="url" id="profilePicUrl" name="profilePicUrl" placeholder="https://example.com/photo.jpg">
+            </div>
+            <button type="submit" class="btn" id="submitBtn">Submit Application</button>
+        </form>
+        <div id="success-message">
+            <h3>Thank You!</h3>
+            <p>Your application has been submitted successfully. We will contact you soon.</p>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+
+    <script>
+        // IMPORTANT: Add your Firebase configuration here (must be same as admin panel)
+        const firebaseConfig = {
+            apiKey: "AIzaSyBtedt3DdNf3cX99-tOsqdnvMhDGFphNsI",
+            authDomain: "schoolmanazmentbynfz.firebaseapp.com",
+            databaseURL: "https://schoolmanazmentbynfz-default-rtdb.firebaseio.com",
+            projectId: "schoolmanazmentbynfz",
+            storageBucket: "schoolmanazmentbynfz.firebasestorage.app",
+            messagingSenderId: "12002840470",
+            appId: "1:12002840470:web:cfaaf4db50c030067017b7",
+            measurementId: "G-TQEDT28GR2"
+        };
+        
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // !! IMPORTANT !! - Replace this with your actual School ID from Firebase
+        const schoolId = "-N_p1xQZYWkXn2r-z6jG"; // Example ID, replace it
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadFormSettings();
+            
+            const admissionForm = document.getElementById('admissionForm');
+            admissionForm.addEventListener('submit', handleFormSubmit);
+        });
+
+        function loadFormSettings() {
+            const settingsRef = db.ref(`schools/${schoolId}/settings`);
+            const classesRef = db.ref(`schools/${schoolId}/admissionSettings/formClasses`);
+
+            // Load school name and logo (only once)
+            settingsRef.once('value').then(snapshot => {
+                const settings = snapshot.val() || {};
+                document.getElementById('schoolName').textContent = `${settings.schoolName || 'School'} Admission`;
+                document.getElementById('schoolLogo').src = settings.schoolLogoUrl || 'https://i.ibb.co/6yT1WfX/school-logo-placeholder.png';
+            });
+            
+            // --- SOLUTION ---
+            // Load and LISTEN for real-time updates for classes
+            classesRef.on('value', snapshot => {
+                const classes = snapshot.val() || {};
+                const classSelector = document.getElementById('className');
+                classSelector.innerHTML = '<option value="">Select a Class...</option>';
+                if (Object.keys(classes).length > 0) {
+                    Object.values(classes).forEach(cls => {
+                        classSelector.innerHTML += `<option value="${cls.name}">${cls.name}</option>`;
+                    });
+                } else {
+                    classSelector.innerHTML = '<option value="">Admissions are currently closed.</option>';
+                }
+            });
+        }
+
+        function handleFormSubmit(e) {
+            e.preventDefault();
+            const form = e.target;
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Submitting...';
+
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+            data.submissionDate = new Date().toISOString(); // Add submission timestamp
+
+            const applicationsRef = db.ref(`schools/${schoolId}/admissionApplications`);
+            applicationsRef.push(data)
+                .then(() => {
+                    form.style.display = 'none';
+                    document.getElementById('success-message').style.display = 'block';
+                })
+                .catch(error => {
+                    alert('An error occurred: ' + error.message);
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Submit Application';
+                });
+        }
+    </script>
+</body>
+</html>
