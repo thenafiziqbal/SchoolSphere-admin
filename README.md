@@ -1,0 +1,2 @@
+# SchoolSphere-admin
+SchoolSphere admin
